@@ -68,13 +68,13 @@ public class FileTransformer {
 		String fullTarget = targetFolderAsString + "\\" + jsonName + ".json";
 		Path targetPath = Paths.get(fullTarget);
 		pointDefs = createMapFromFile();
-		JSONArray allStuff = new JSONArray();
+		JSONObject mainObj = new JSONObject();
 
 		for (Iterator<String> iter = filesToHandle.iterator(); iter.hasNext();) {
 
 			String file = iter.next();
 			String fullActualPath = sourceFolderPathString + "\\" + file + ".kml";
-			//no need to initialze the lists/arrays, they are always new initialized in the appropriate methods
+			//no need to initialize the lists/arrays, they are always new initialized in the appropriate methods
 			List<Double>[] result = getCoordinatesAsArray(fullActualPath);
 			longList = result[0];
 			latList = result[1];
@@ -83,7 +83,6 @@ public class FileTransformer {
 			polyLineData = generatePolyLineTrace(0);
 
 			JSONObject obj = new JSONObject();
-			obj.put("name", file.substring(0, 10));
 			obj.put("startPoint", pointDefs.get(file.substring(0, 3)));
 			obj.put("endPoint", pointDefs.get(file.substring(4, 7)));
 			obj.put("length", distAltArray[distAltArray.length - 1][0]);
@@ -112,12 +111,12 @@ public class FileTransformer {
 			}
 			obj.put("polyLine", polyLine);
 
-			allStuff.add(obj);
+			mainObj.put(file.substring(0, 10), obj);
 
 		}
 		try (FileWriter fw = new FileWriter(targetPath.toFile(), true)) {
 
-			fw.write(allStuff.toJSONString());
+			fw.write(mainObj.toJSONString());
 			fw.flush();
 
 		} catch (IOException e) {

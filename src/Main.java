@@ -21,7 +21,7 @@ public class Main {
 				"C:\\Users\\Rita\\Documents\\WIFI_Kurs\\MyProject_Orseg\\MAP_FILES\\FILES_W_ALT\\filenamesList_Test.txt",
 				"C:\\Users\\Rita\\Documents\\WIFI_Kurs\\MyProject_Orseg\\MAP_FILES\\FILES_W_ALT\\forMap.txt",
 				"C:\\Users\\Rita\\Documents\\WIFI_Kurs\\MyProject_Orseg\\MAP_FILES\\JSON",
-				"test01");
+				"test03");
 
 		ft.doTheJob();
 
