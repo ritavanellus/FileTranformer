@@ -18,10 +18,10 @@ public class Main {
 	public static void main(String[] args) {
 		FileTransformer ft = new FileTransformer(
 				"C:\\Users\\Rita\\Documents\\WIFI_Kurs\\MyProject_Orseg\\MAP_FILES\\FILES_W_ALT",
-				"C:\\Users\\Rita\\Documents\\WIFI_Kurs\\MyProject_Orseg\\MAP_FILES\\FILES_W_ALT\\filenamesList_Test.txt",
+				"C:\\Users\\Rita\\Documents\\WIFI_Kurs\\MyProject_Orseg\\MAP_FILES\\FILES_W_ALT\\filenamesList_All.txt",
 				"C:\\Users\\Rita\\Documents\\WIFI_Kurs\\MyProject_Orseg\\MAP_FILES\\FILES_W_ALT\\forMap.txt",
 				"C:\\Users\\Rita\\Documents\\WIFI_Kurs\\MyProject_Orseg\\MAP_FILES\\JSON",
-				"test03");
+				"test_All");
 
 		ft.doTheJob();
 
