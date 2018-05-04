@@ -60,7 +60,7 @@ public class FileTransformer {
 	 * Contains info on the plotlines, too - start and end plotline 
 	 * Strategy: create JSON, parameters: startLine, endLine, data 
 	 * data should be arranged as a 2D array, inner arrays are x-y data pairs, distance-elevation 
-	 * unnecessary points (no change in elevation) should be eliminated to spare speed.
+	 * unnecessary points (no change in elevation) should be eliminated to spare data points.
 	 */
 	public void doTheJob() {
 		filesToHandle = new ArrayList<String>();
@@ -79,6 +79,7 @@ public class FileTransformer {
 			longList = result[0];
 			latList = result[1];
 			altList = result[2];
+			//here one can give a threshold to discard points with no relevant alt change - still better to kepp at zero
 			distAltArray = generateDistAlt(0);
 			polyLineData = generatePolyLineTrace(0);
 
@@ -94,7 +95,11 @@ public class FileTransformer {
 			obj.put("elevation", elevation);
 
 			JSONArray distAlt = new JSONArray();
+			//check if Alt value is 0, then skip it!
 			for (double[] subArray : distAltArray) {
+				if (subArray[1]==0){
+					continue;
+				}
 				JSONObject xyPair = new JSONObject();
 				xyPair.put("x", subArray[0]);
 				xyPair.put("y", subArray[1]);
@@ -195,7 +200,7 @@ public class FileTransformer {
 		return result;
 	}
 
-	//later it will be appended to filter out important points (that's why the smoothThreshold is introduced)
+	//points with no relevant change in alt are discarded (change<smoothThreshold is considered irrelevant)
 	public double[][] generateDistAlt(int smoothThreshold) {
 
 		double dist = 0;
@@ -207,6 +212,7 @@ public class FileTransformer {
 		double deltaY;
 		double deltaXinKm;
 		double deltaYinKm;
+		double altLevel = 0;
 
 		int pos = 0;
 		int N = longList.size();
@@ -215,11 +221,14 @@ public class FileTransformer {
 		while (pos < N) {
 			if (pos == 0) {
 				distAltArray[0][0] = 0;
-				distAltArray[0][1] = altList.get(0);
+				double firstAlt = altList.get(0);
+				distAltArray[0][1] = firstAlt;
+				altLevel = firstAlt;
 				oldX = longList.get(0);
 				oldY = latList.get(0);
 				pos++;
 			} else {
+				double currAlt = altList.get(pos);
 				newX = longList.get(pos);
 				newY = latList.get(pos);
 				deltaX = newX - oldX;
@@ -229,7 +238,14 @@ public class FileTransformer {
 				double currDist = Math.sqrt(Math.pow(deltaXinKm, 2) + Math.pow(deltaYinKm, 2));
 				dist += currDist;
 				distAltArray[pos][0] = dist;
-				distAltArray[pos][1] = altList.get(pos);
+
+				//case: no relevant change in Alt - set Alt to 0 in the subarray
+				if (currAlt >= altLevel - smoothThreshold && currAlt <= altLevel + smoothThreshold) {
+					distAltArray[pos][1] = 0;
+				} else {
+					distAltArray[pos][1] = currAlt;
+					altLevel = currAlt;
+				}
 				oldX = newX;
 				oldY = newY;
 				pos++;
@@ -276,8 +292,8 @@ public class FileTransformer {
 		try (BufferedReader br = new BufferedReader(new FileReader(sourcePath.toFile()))) {
 			String line;
 
-			while ((line = br.readLine()) != null) {
-				String[] splitted = line.split(",");
+			while ((line = br.readLine()) != null) {				
+				String[] splitted = line.split(",");				
 				map.put(splitted[0], splitted[1]);
 			}
 
